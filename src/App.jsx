@@ -12,8 +12,11 @@ function App() {
             const response = await fetch(API_URL + text);
             const responseData = await response.json();
 
-            if (responseData.message === "Not Found") return;
-            setUser(responseData);
+            if (responseData.message === "Not Found") {
+                setUser(null);
+            } else {
+                setUser(responseData);
+            }
         } catch (error) {
             console.error(error);
         }
