@@ -7,14 +7,23 @@ import { User } from "./types";
 function App() {
     const API_URL = "https://api.github.com/users/";
     const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string>("");
 
     async function fetchUser(text: string) {
+        setUser(null);
+        setIsLoading(true);
+        setError("");
+
         try {
             const response = await fetch(API_URL + text);
+
+            // if (!response.ok) throw new Error(`Error! Status: ${response.status}`);
+
             const responseData = await response.json();
 
             if (responseData.message === "Not Found") {
-                setUser(null);
+                throw new Error("Error! No user found");
             } else {
                 const user: User = {
                     avatarUrl: responseData.avatar_url,
@@ -26,8 +35,10 @@ function App() {
                 };
                 setUser(user);
             }
-        } catch (error) {
-            console.error(error);
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -35,7 +46,9 @@ function App() {
         <div>
             <h1>GitHub User Search</h1>
             <Form onSubmit={fetchUser} />
+            {isLoading && <p>Loading...</p>}
             {user && <UserComp user={user} />}
+            {error && <p>{error}</p>}
         </div>
     );
 }
