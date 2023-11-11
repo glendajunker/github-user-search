@@ -2,7 +2,7 @@ import { useState } from "react";
 import Form from "./components/Form";
 import UserComp from "./components/User";
 import "./App.css";
-import { User } from "./types";
+import { User, githubUserResponseSchema } from "./types";
 
 function App() {
     const API_URL = "https://api.github.com/users/";
@@ -18,23 +18,11 @@ function App() {
         try {
             const response = await fetch(API_URL + text);
 
-            // if (!response.ok) throw new Error(`Error! Status: ${response.status}`);
+            if (!response.ok) throw new Error(`Error! Status: ${response.status}`);
 
-            const responseData = await response.json();
-
-            if (responseData.message === "Not Found") {
-                throw new Error("Error! No user found");
-            } else {
-                const user: User = {
-                    avatarUrl: responseData.avatar_url,
-                    company: responseData.company,
-                    htmlUrl: responseData.html_url,
-                    login: responseData.login,
-                    location: responseData.location,
-                    name: responseData.name,
-                };
-                setUser(user);
-            }
+            const responseData: unknown = await response.json();
+            const user: User = githubUserResponseSchema.parse(responseData);
+            setUser(user);
         } catch (error: any) {
             setError(error.message);
         } finally {
