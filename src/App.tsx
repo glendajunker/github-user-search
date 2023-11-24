@@ -3,17 +3,16 @@ import Form from "./components/Form";
 import UserComp from "./components/User";
 import "./App.css";
 import { User, githubUserResponseSchema } from "./types";
+import * as RD from "@devexperts/remote-data-ts";
+import { pipe } from "fp-ts/lib/function";
 
 function App() {
     const API_URL = "https://api.github.com/users/";
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string>("");
+
+    const [user, setUser] = useState<RD.RemoteData<Error, User>>(RD.initial);
 
     async function fetchUser(text: string) {
-        setUser(null);
-        setIsLoading(true);
-        setError("");
+        setUser(RD.pending);
 
         try {
             const response = await fetch(API_URL + text);
@@ -22,11 +21,10 @@ function App() {
 
             const responseData: unknown = await response.json();
             const user: User = githubUserResponseSchema.parse(responseData);
-            setUser(user);
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
+            setUser(RD.success(user));
+        } catch (error: unknown) {
+            if (error instanceof Error) setUser(RD.failure(error));
+            setUser(RD.failure(Error(String(error))));
         }
     }
 
@@ -34,9 +32,15 @@ function App() {
         <div>
             <h1>GitHub User Search</h1>
             <Form onSubmit={fetchUser} />
-            {isLoading && <p>Loading...</p>}
-            {user && <UserComp user={user} />}
-            {error && <p>{error}</p>}
+            {pipe(
+                user,
+                RD.fold(
+                    () => <></>,
+                    () => <p>Loading...</p>,
+                    (error) => <p>{error.message}</p>,
+                    (data) => <UserComp user={data} />
+                )
+            )}
         </div>
     );
 }
