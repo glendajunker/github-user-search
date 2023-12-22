@@ -32,15 +32,17 @@ function App() {
         <div>
             <h1>GitHub User Search</h1>
             <Form onSubmit={fetchUser} />
-            {pipe(
-                user,
-                RD.fold(
-                    () => <></>,
-                    () => <p>Loading...</p>,
-                    (error) => <p>{error.message}</p>,
-                    (data) => <UserComp user={data} />
-                )
-            )}
+            <div id="output">
+                {pipe(
+                    user,
+                    RD.fold(
+                        () => <></>,
+                        () => <p>Loading...</p>,
+                        (error) => <p>{error.message}</p>,
+                        (data) => <UserComp user={data} />
+                    )
+                )}
+            </div>
         </div>
     );
 }
