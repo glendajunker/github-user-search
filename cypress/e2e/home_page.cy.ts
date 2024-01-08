@@ -6,15 +6,20 @@ describe("The Home Page", () => {
             });
         }).as("fetchGitHubApiUsers");
 
+        const selectors = {
+            usernameInput: () => cy.get("input"),
+            submitButton: () => cy.get("button"),
+            output: () => cy.get("#output"),
+            usernameHeadline: () => cy.get("#output").get("h2"),
+        };
+
         return {
-            selectors: {
-                usernameInput: () => cy.get("input"),
-                submitButton: () => cy.get("button"),
-                output: () => cy.get("#output"),
-                usernameHeadline: () => cy.get("#output").get("h2"),
-            },
+            selectors,
             interceptAlias: {
                 fetchGitHubApiUsers: "@fetchGitHubApiUsers",
+            },
+            assert: {
+                assert404ErrorStatus: () => selectors.output().contains("Error: Error! Status: 404"),
             },
         };
     };
@@ -37,12 +42,12 @@ describe("The Home Page", () => {
     });
 
     it("Returns error message if no user is found", () => {
-        const { selectors } = build();
+        const { selectors, assert } = build();
 
         cy.visit("/");
 
         selectors.usernameInput().type("asda76d7a8ad6");
         selectors.submitButton().click();
-        selectors.output().contains("Error: Error! Status: 404");
+        assert.assert404ErrorStatus();
     });
 });
