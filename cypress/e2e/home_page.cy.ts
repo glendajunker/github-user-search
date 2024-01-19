@@ -9,18 +9,18 @@ describe("The Home Page", () => {
         const selectors = {
             usernameInput: () => cy.get("input"),
             submitButton: () => cy.get("button"),
-            output: () => cy.get("#output"),
-            usernameHeadline: () => cy.get("#output").get("h2"),
+            output: () => cy.get("#outpumt"),
+            usernameHeadline: () => cy.get("#output").get("h2")
         };
 
         return {
             selectors,
             interceptAlias: {
-                fetchGitHubApiUsers: "@fetchGitHubApiUsers",
+                fetchGitHubApiUsers: "@fetchGitHubApiUsers"
             },
             assert: {
-                assert404ErrorStatus: () => selectors.output().contains("Error: Error! Status: 404"),
-            },
+                assert404ErrorStatus: () => selectors.output().contains("Error: Error! Status: 404")
+            }
         };
     };
 
