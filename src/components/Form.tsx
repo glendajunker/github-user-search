@@ -19,7 +19,7 @@ function Form(props: FormProps) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <input type="text" value={searchText} onChange={changeSearchText} />
+            <input type="text" value={searchText} onChange={changeSearchText} placeholder="Type a username..." />
             <button type="submit">Search</button>
         </form>
     );
